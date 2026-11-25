@@ -1,0 +1,56 @@
+1. git diff
+    1-1. Git에서 두 상태 사이에 어떤 차이가 존재하는지 확인하는 명령어입니다.
+
+    1-2. HEAD -> 마지막 커밋에 기록된 파일 상태 / Index -> 다음 커밋에 포함하도록 준비한 파일 상태
+            WD -> 실제 작업 중인 파일 상태
+
+    1-3. 이 세 영역 중 어떤 영역을 비교할지에 따라 git diff의 결과 달라집니다.
+        명령어	             비교 대상
+        git diff	        Index ↔ Working Directory
+        git diff --cached	HEAD ↔ Index
+        git diff HEAD	    HEAD ↔ Working Directory
+
+
+2. 기본 git diff의 동작
+    2-1. 모든 파일이 커밋된 상태라고 가정합니다.
+    2-2. 이 때 HEAD, Index, WD는 동일한 상태입니다.
+    2-3. WD에서 파일에 변동이 발생합니다.
+    2-4. 그렇다면 HEAD, Index는 같은 상태이고 WD만 변경된 상태입니다.
+    2-5. git diff를 하면 Index에 기록된 Blob의 내용과 WD에 존재하는 실제 파일 내용을 비교합니다.
+        => 엄밀히 말하면 Index Blob 객체 ID를 따락 object 내용과 비교하는 것입니다.
+    2-6. 즉, Index와 WD를 비교하는 명령어입니다.
+
+
+3. git diff 변경된 내용 표현
+    3-1. diff --git
+        => diff --git a/Student.cpp b/Student.cpp
+        => a는 비교 기준이 되는 이전 상태의 파일 / b는 비교 대상이 되는 새로운 상태의 파일
+        => a,b는 실제 폴더가 아니라 두 파일 상태를 구분하기 위한 접두사입니다.
+        => a는 Index, b는 WD 상태입니다.
+    
+    3-2. index 64b4bad..7500bfd 100644
+        => 64b.. -> 이전 상태의 Blob 객체 ID 축약형
+        => 750.. -> 새로운 상태의 Blob 객체 ID 축약형
+        => 100.. -> 일반 파일의 Git 파일 모드
+        => WD를 수정하지 않아도 git diff 명령어 시 내용에 해당하는 Blob 객체 ID를 계산할 수 있습니다.
+        => 이 떄 객체나 ID가 index나 object에 저장되는 것은 아닙니다.
+    
+    3-3. --- 와 +++
+        => ---은 이전 상태의 파일
+        => +++은 새로운 상태의 파일
+    
+    3-4. @@ -1,3 +1,7 @@
+        => Hunk Header라고 합니다.
+        => Hunk는 변경된 부분과 그 주변 문맥을 묶은 단위입니다.
+        => -1,3 -> 이전 파일에서 1번쨰 줄부터 총 3줄
+        => +1,7 -> 새로운 파일에서 1번쨰 줄부터 총 7줄
+    
+
+4. git diff --cached
+    4-1. HEAD에 기록된 파일 상태와 Index에 스테이징된 파일 상태를 비교합니다.
+    4-2. git add를 한 이후 git diff는 아무런 변경 내용을 출력하지 않습니다.
+
+
+5. 옵션
+    => git diff (--cached) --파일명
+    => 해당 파일에 한정해서 변경 내역을 출력합니다.

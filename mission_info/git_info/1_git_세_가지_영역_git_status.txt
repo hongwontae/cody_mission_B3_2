@@ -1,0 +1,89 @@
+1. Git 세 가지 영역
+    1-1. Working Directory (작업 디렉터리) — 실제로 코드를 수정하는 공간
+    1-2. Staging Area (스테이징 영역) — 다음 커밋에 포함할 변경 사항을 준비하는 공간
+    1-3. Repository (저장소) — 커밋으로 확정된 이력을 저장하는 공간
+
+
+2. Working Directory
+    2-1. 개발자가 실제로 작업하는 디렉터리를 의미합니다.
+    2-2. 저장된 파일을 수정했을 떄 수정 내역은 Working Directory에서만 존재합니다.
+        => 이 떄 Git은 현재 작업 파일과 이전에 기록된 내용을 비교해 변경 여부를 알아낼 수 있습니다.
+
+
+3. Staging Area
+    3-1. 다음 커밋에 포함할 내용을 미리 준비하는 영역입니다.
+    3-2. git add Student.cpp
+        => 현재 Student.cpp의 내용이 Staging Area에 등록됩니다.
+
+
+4. Repository
+    4-1. Git이 커밋 이력을 저장하는 영역입니다.
+    4-2. 로컬 Git 프로젝트에서는 .git 디렉터리 내부에 Git의 관리 정보가 저장됩니다.
+    4-3. Git은 Staging Area에 준비된 내용을 바탕으로 새로운 커밋을 생성합니다.
+    4-4. 커밋에는 파일 상태를 나타내는 스냅샷과 함께 작성자, 시간, 커밋 메시지, 부모 커밋 등의 정보가 기록됩니다.
+
+
+5. git status
+    5-1. 현재 Git 프로젝트에서 어떤 파일이 변경되었고,
+         그 변경 사항이 커밋 준비까지 되었는지 확인하는 명령어입니다.
+    5-2. Git이 세 영역의 상태를 비교합니다.
+        => HEAD ↔ Staging Area: 커밋할 변경 사항이 존재하는가?
+        => Staging Area ↔ Working Directory: 아직 스테이징하지 않은 변경 사항이 존재하는가?
+        => 추적되지 않는 파일: Git이 아직 관리 대상으로 등록하지 않은 파일이 존재하는가?
+    
+    5-3. Staging Area는 커밋이 끝났다고 비워지는 공간이 아닙니다.
+        => Staging Area(Index)는 다음 커밋에 사용할 파일들의 상태를 기록해 두는 공간입니다.
+        => Student.cpp에 int age = 10; 그리고 add 후 commit
+        => 그렇다면 head commit, Staging Area, Working 모두 age = 10를 가리키는 상태가 됩니다.
+        => 커밋 이후에도 Staging Area에 상태가 유지됩니다.
+    
+    5-4. Staging Area가 비워졌다의 의미
+        => Staging Area에 아무 파일도 없다는 뜻이 아니라, 
+            HEAD와 비교했을 때 새로운 변경 사항이 없다는 뜻입니다.
+        => HEAD와 Staging Area가 같아 새로운 변경 사항이 없기에,
+            git status에 nothing to commit, working tree clean 표시합니다.
+    
+    5-5. Working Directory를 int age = 20; 수정하면,
+            head와 Staging Area는 같고, Staging Area와 Working Directory는 다릅니다.
+        => 내용이 다르기에 git status에서 modified가 표시됩니다.
+
+
+6. git index
+    6-1. 다음 커밋에 포함될 파일들의 상태를 기록하는 자료구조입니다.
+    6-2. Staging Area는 사실 Git Index를 개념적으로 표현한 이름입니다.
+    6-3. git 프로젝트 구조
+        .git/
+        ├── HEAD
+        ├── index
+        ├── objects/
+        └── refs/
+    6-4. .git/index가 바로 Git Index를 저장하는 파일입니다.
+    6-5. git이 사용하는 바이너리 형식의 파일입니다.
+    6-6. 예시
+        => Student.cpp 파일에서 int age = 10; git add Student.cpp를 실행하면 세 가지 작업을 수행합니다.
+        => Student.cpp의 내용을 Git Blob 객체로 저장한다.
+        => 해당 Blob 객체의 ID를 계산한다.
+        => Index에 Blob 객체 ID, 파일 경로 등의 정보를 기록한다.
+        => Blob 객체는 .git/objects에 저장됩니다. (Blob ID도 존재)
+    
+    6-7. add -> commit
+        커밋 전
+        Index
+        Student.cpp → Blob A
+
+        Objects
+        Blob A → int age = 10;
+     --------------------------
+        커밋 후
+        HEAD의 커밋
+        Student.cpp → Blob A
+
+        Index
+        Student.cpp → Blob A
+
+        Objects
+        Blob A → int age = 10;
+        => 커밋한다고 해서 Blob A가 Index에서 Objects로 이동하는 게 아니라는 것입니다.
+        => Blob A는 git add할 때 객체 데이터베이스에 저장됐습니다.
+        => git commit은 그 Blob을 포함하는 파일 상태를 커밋 이력에 기록하는 것입니다.
+

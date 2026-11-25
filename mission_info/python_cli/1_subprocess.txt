@@ -1,0 +1,39 @@
+1. subprocess
+    1-1. Python 프로그램에서 다른 프로그램을 실행하고 
+        그 결과를 가져올 수 있게 해 주는 표준 라이브러리 모듈입니다.
+    1-2. 과제에서는 python 프로그램이 git를 실행하고 그 결과를 받아야 합니다.
+
+
+2. subprocess.run()의 기본 구조
+    import subprocess
+
+    result = subprocess.run(
+        ["git", "status"],
+        capture_output=True,
+        text=True
+    )
+
+    print(result.stdout)
+
+    2-1. 이 코드를 실행하면 Python이 Git 프로그램을 실행합니다.
+    2-2. 흐름
+        => 프로그램 -> subprocess.run() -> git 프로그램 -> git status 실행 -> 실행 결과
+            -> python result 변수
+    2-3. subprocess.run() 인수
+        1. 첫 번쨰 인수는 리스트로 실행할 프로그램과 실행할 프로그램에 전달할 인수입니다.
+            => 인수는 문자열로 받습니다.
+            => ["git", "status"]
+            => git은 실행할 프로그램, status는 실행할 프로그램에 전달할 인수
+    
+        2. capture_output=True,
+            => subprocess.run(["git", "status"])
+            => git 프로그램이 명령어를 처리하고 터미널에 결과가 출력됩니다.
+            => 그러나 결과를 python이 문자열로 받아서 저장한게 아닙니다.
+            => capture_output=True 인수를 사용하면 git 출력 결과를 python이 받아서 저장할 수 있습니다.
+            => 또한 기존에는 git 출력이 그대로 나왔지만 result.stdout를 print 하지 않으면 출력하지 않습니다.
+            => capture_output은 stdout, stderr 두 개의 출력을 모두 python이 수집하게 합니다.
+            => 오류가 발생했을 떄도 문자열로 저장합니다.
+        
+        3. text = True
+            => 외부 프로그램의 출력을 문자열(str)로 받을 수 있습니다.
+            => text=True를 설정하지 않으면 기본적으로 출력이 바이트(bytes) 형태로 반환됩니다.
