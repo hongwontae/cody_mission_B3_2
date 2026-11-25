@@ -1,0 +1,100 @@
+1. argparse
+    1-1. 터미널에서 python 프로그램을 실행할 떄 
+        전달하는 인자를 분석하고 처리하기 위한 python 표준 라이브러리입니다.
+    1-2. 과제에서는 사용자가 commit을 입력했는지, pr을 입력했는지에
+         따라 프로그램의 동작을 구분하기 위해 사용합니다.
+
+
+2. 명령줄 인자
+    2-1. python 프로그램을 실행하면서 외부에서 값을 전달할 수 있습니다.
+        => 이 전달된 값을 명령줄 인자라고 합니다.
+    2-2. python main.py commit | python main.py pr
+        => commit, pr이 명령줄 인자입니다.
+
+
+3. argparse를 사용하는 이유
+    3-1. sys.argv를 사용해도 명령줄 인자를 다룰 수 있습니다.
+        => 다양한 불편함이 존재합니다.
+        => 사용자가 인자를 전달하지 않으면 IndexError, 사용자가 잘못된 인자를 전달할 경우 직접 검증
+        => 인자가 많아지면 각각의 인덱스를 관리, 사용 방법이나 도움말을 직접 작성, 문자열로 전달된 숫자를 직접 형변환
+    3-2. 위 같은 단점을 편리하게 처리해주는 라이브러리가 argparse입니다.
+
+
+4. argparse의 기본 사용 방법
+    4-1. import argparse
+
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument("command")
+
+        args = parser.parse_args()
+
+        print(args.command)
+
+        python main.py commit // 실행 결과 commit
+    
+    4-2. parser = argparse.ArgumentParser()
+        => ArgumentParser는 명령줄 인자를 분석하기 위한 클래스입니다.
+        => 이 객체를 통해 어떤 명령줄 인자를 받을 것인지, 어떤 조건을 적용할 것인지 설정하게 됩니다.
+    
+    4-3. parser.add_argument("command")
+        => add_argument()는 어떤 명령줄 인자를 받을 것인지 정의하는 메서드입니다.
+        => python main.py commit
+        => command라는 이름으로 인자 하나를 받겠다고 설정한 것입니다.
+        => 이 시점에서는 아직 실제 명령줄 인자를 분석하지 않았습니다. 인자를 처리하기 위한 규칙 등록입니다.
+    
+    4-4. args = parser.parse_args()
+        => 설정한 규칙을 바탕으로 실제로 전달된 명령줄 인자를 분석하는 메서드입니다.
+        => 이 메서드를 호출하는 순간 parser는 기본적으로 sys.argv[1:]의 값을 가져옵니다.
+        => sys.argv # ['main.py', 'commit']
+        => sys.argv[1:] # ['commit']
+    
+    4-5. 위치 인자와 옵션 인자
+        => 위치 인자 (Positional argument)
+        => 전달하는 순서에 따라 어떤 인자인지 결정됩니다.
+        =>python main.py hong 20
+
+        => 옵션 인자 (Optional argument)
+        => 인자 이름 앞에 -- or -를 붙이는 방식입니다.
+        => 옵션 인자는 순서를 바꿔도 됩니다. -> key를 통해 value를 얻기 때문입니다.
+        => python main.py --name hong --age 20
+
+    
+5. add_argument()의 주요 옵션
+
+    5-1. type — 자료형 변환
+        => 명령줄에서 전달되는 값은 기본적으로 문자열입니다.
+        => parser.add_argument("age", type=int)
+        => 자동으로 int로 바꿔줍니다.
+    
+    5-2. choices — 입력 가능한 값 제한
+        => parser.add_argument("command", choices=["commit", "pr"])
+        => 사용자는 commit 아니면 pr만 입력할 수 있습니다.
+        => 그 외 명령줄 인자는 argparse에 의해 예외처리가 됩니다.
+    
+    5-3. default — 기본값 설정
+        => parser.add_argument("--language", default="ko")
+        => python main.py  #args.language  # "ko"
+        => python main.py --language en # "en"
+    
+    5-4. help — 인자 설명
+        => parser.add_argument("command", choices=["commit", "pr"], help="생성할 메시지의 종류")
+        => argparse는 기본적으로 -h, --help 옵션을 제공합니다.
+        => python main.py --help
+        => usage: main.py [-h] {commit,pr}
+            positional arguments:
+            {commit,pr}  생성할 메시지의 종류
+            options:
+            -h, --help   show this help message and exit
+    
+    5-5. required — 필수 옵션 지정
+        => 옵션 인자는 기본적으로 생략할 수 있지만 required=True를 설정하면 반드시 전달해야 합니다.
+        => parser.add_argument("--name", required=True)
+        => python main.py --name hong -> --name과 value가 반드시 필요합니다.
+    
+    5-6. action="store_true" — 플래그 처리
+        => 값을 전달하지 않고 옵션의 존재 여부만으로 참과 거짓을 구분하는 기능입니다.
+        => 일반적인 옵션 인자와 달리 뒤에 값을 전달할 필요가 없습니다.
+        => python main.py --verbose # arg.verbose -> True
+        => python main.py           # arg.verbose -> False
+    
