@@ -1,0 +1,17 @@
+# Python 가상환경
+.venv/
+venv/
+
+# Python 캐시 파일
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 환경변수 및 민감 정보
+.env
+.env.*
+!.env.example
+
+# macOS 시스템 파일
+.DS_Store
